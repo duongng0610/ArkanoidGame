@@ -1,0 +1,85 @@
+# =========================
+# Gradle / build
+# =========================
+/.gradle/
+build/
+out/
+# keep gradle wrapper jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# ignore build outputs in submodules (safe patterns)
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/src/main/**/out/
+!**/src/test/**/out/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# =========================
+# Logs / runtime files
+# =========================
+*.log
+logs/
+logs/**
+
+# FXGL crash / hs_err
+hs_err_pid*
+crash-*
+
+# =========================
+# IntelliJ IDEA
+# =========================
+/.idea/
+*.iws
+*.iml
+*.ipr
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+.idea/workspace.xml
+.idea/inspectionProfiles/
+
+# if you want to keep module iml for library sharing, remove *.iml above
+
+# =========================
+# Eclipse / NetBeans / VS Code
+# =========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.nb-gradle/
+.vscode/
+
+# =========================
+# Java specifics / binaries
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+*.env
+secrets/
+*.keystore
+*.jks
+
+# =========================
+# Misc / temporary
+# =========================
+*.log.*
+*~
+*.tmp
+*.swp
