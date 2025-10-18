@@ -59,7 +59,6 @@ public class LevelManager {
         switch (types) {
             case "1" : return new NormalBrick(x, y);
             case "2" : return new StrongBrick(x, y);
-
             default: return null;
         }
     }

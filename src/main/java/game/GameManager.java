@@ -31,6 +31,7 @@ public class GameManager {
     private int score;
     private int lives;
     private int currentLevel;
+    private boolean isPaused = false;
 
     public GameManager(GameView gameView, Main mainApp) {
         this.gameView = gameView;
@@ -80,7 +81,7 @@ public class GameManager {
             gameView.getGamePane().getChildren().add(brick.getView());
         }
 
-        inputHandler = new InputHandler(gameView.getScene(), paddle);
+        inputHandler = new InputHandler(gameView.getScene(), paddle, this);
 
         gameView.getRenderer().updateScore(score);
         gameView.getRenderer().updateLives(lives);
@@ -88,7 +89,7 @@ public class GameManager {
     }
 
     private void update() {
-        if (!isRunning) return;
+        if (!isRunning || isPaused) return;
 
         inputHandler.handleInput();
 
@@ -254,6 +255,18 @@ public class GameManager {
     public void increaseScore(int amount) {
         score += amount;
         gameView.getRenderer().updateScore(score);
+    }
+
+    public void togglePause() {
+        if (!isRunning) return; // Không pause khi game chưa chạy
+        isPaused = !isPaused;
+        if (isPaused) {
+            gameLoop.stop();
+            gameView.getRenderer().showMessage("PAUSED");
+        } else {
+            gameView.getRenderer().hideMessage();
+            gameLoop.start();
+        }
     }
 
 }
