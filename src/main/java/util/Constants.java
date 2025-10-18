@@ -13,7 +13,7 @@ public class Constants {
 
     // Ball
     public static final double BALL_RADIUS = 7.5;
-    public static final double BALL_SPEED = 5.0;
+    public static final double BALL_SPEED = 4.0;
 
     // Brick
     public static final double BRICK_WIDTH = 60;
@@ -28,6 +28,8 @@ public class Constants {
     public static final int NORMAL_BRICK_HP = 1;
     public static final int STRONG_BRICK_SCORE = 30;
     public static final int STRONG_BRICK_HP = 3;
+    public static final int EXPLOSIVE_BRICK_SCORE = 10;
+    public static final int EXPLOSIVE_BRICK_HP = 1;
 
 
     // PowerUp

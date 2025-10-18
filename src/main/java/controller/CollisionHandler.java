@@ -2,10 +2,7 @@ package controller;
 
 import game.GameManager;
 import javafx.geometry.Bounds;
-import objects.Ball;
-import objects.Brick;
-import objects.Paddle;
-import objects.PowerUp;
+import objects.*;
 import util.Constants;
 
 import java.util.Iterator;
@@ -58,108 +55,102 @@ public class CollisionHandler {
             }
 
             if (ball.getBounds().intersects(brick.getBounds())) {
-                brick.takeHit();
 
-                if (brick.isDestroyed()) {
-                    gameManager.increaseScore(brick.getScore());
-                    // spawn powerup in brick
-                    gameManager.spawnPowerUp(brick);
-                }
+                // ball bounce
+                handleBounce(ball, brick);
 
-                Bounds ballBounds = ball.getBounds();
-                Bounds brickBounds = brick.getBounds();
-
-                // previous bounds
-                double dx = ball.getDx();
-                double dy = ball.getDy();
-
-                double prevMaxX = ballBounds.getMaxX() - dx;
-                double prevMinX = ballBounds.getMinX() - dx;
-                double prevMaxY = ballBounds.getMaxY() - dy;
-                double prevMinY = ballBounds.getMinY() - dy;
-
-                // go from top condition
-                boolean fromTop = false;
-                if (dy > 0 && prevMaxY <= brickBounds.getMinY()) {
-                    fromTop = true;
-                }
-
-                // go from bottom condition
-                boolean fromBottom = false;
-                if (dy < 0 && prevMinY >= brickBounds.getMaxY()) {
-                    fromBottom = true;
-                }
-
-                // go from left condition
-                boolean fromLeft = false;
-                if (dx > 0 && prevMaxX <= brickBounds.getMinX()) {
-                    fromLeft = true;
-                }
-
-                // go from right condition
-                boolean fromRight = false;
-                if (dx < 0 && prevMinX >= brickBounds.getMaxX()) {
-                    fromRight = true;
-                }
-
-                // top / bottom
-                if (fromTop || fromBottom) {
-                    if (fromTop) {
-                        double newY = brickBounds.getMinY() - ball.getHeight();
-                        ball.setY(newY);
-                        ball.bounceY();
-                    } else {
-                        double newY = brickBounds.getMaxY();
-                        ball.setY(newY);
-                        ball.bounceY();
-                    }
-
-                // left / right
-                } else if (fromLeft || fromRight) {
-                    if (fromLeft) {
-                        double newX = brickBounds.getMinX() - ball.getWidth();
-                        ball.setX(newX);
-                        ball.bounceX();
-                    } else {
-                        double newX = brickBounds.getMaxX();
-                        ball.setX(newX);
-                        ball.bounceX();
-                    }
-
-                // corner
+                if (brick instanceof UnbreakableBrick) {
+                    continue;
                 } else {
-                    double overlapLeft = ballBounds.getMaxX() - brickBounds.getMinX();
-                    double overlapRight = brick.getBounds().getMaxX() - ballBounds.getMinX();
-                    double overlapTop = ballBounds.getMaxY() - brickBounds.getMinY();
-                    double overlapBottom = brickBounds.getMaxY() - ballBounds.getMinY();
+                    brick.takeHit();
 
-                    double minOverlapX = Math.min(overlapLeft, overlapRight);
-                    double minOverlapy = Math.min(overlapBottom, overlapTop);
+                    if (brick.isDestroyed()) {
+                        gameManager.increaseScore(brick.getScore());
+                        gameManager.spawnPowerUp(brick);
+                    }
 
-                    if (minOverlapX < minOverlapy) {
-                        if (overlapLeft < overlapRight) {
-                            double newX = brickBounds.getMinX() - ball.getWidth();
-                            ball.setX(newX);
-                            ball.bounceX();
-                        } else {
-                            double newX = brickBounds.getMaxX();
-                            ball.setX(newX);
-                            ball.bounceX();
-                        }
-                    } else {
-                        if (overlapTop < overlapBottom) {
-                            double newY = brickBounds.getMinY() - ball.getHeight();
-                            ball.setY(newY);
-                            ball.bounceY();
-                        } else {
-                            double newY = brickBounds.getMaxY();
-                            ball.setY(newY);
-                            ball.bounceY();
-                        }
+                    if (brick instanceof ExplosiveBrick) {
+                        explode(brick, bricks);
                     }
                 }
-
                 return;
+            }
+        }
+    }
+
+    private void handleBounce(Ball ball, Brick brick) {
+        Bounds ballBounds = ball.getBounds();
+        Bounds brickBounds = brick.getBounds();
+
+        // previous bounds
+        double dx = ball.getDx();
+        double dy = ball.getDy();
+
+        double prevMaxX = ballBounds.getMaxX() - dx;
+        double prevMinX = ballBounds.getMinX() - dx;
+        double prevMaxY = ballBounds.getMaxY() - dy;
+        double prevMinY = ballBounds.getMinY() - dy;
+
+        // go from top condition
+        boolean fromTop = false;
+        if (dy > 0 && prevMaxY <= brickBounds.getMinY()) {
+            fromTop = true;
+        }
+
+        // go from bottom condition
+        boolean fromBottom = false;
+        if (dy < 0 && prevMinY >= brickBounds.getMaxY()) {
+            fromBottom = true;
+        }
+
+        // go from left condition
+        boolean fromLeft = false;
+        if (dx > 0 && prevMaxX <= brickBounds.getMinX()) {
+            fromLeft = true;
+        }
+
+        // go from right condition
+        boolean fromRight = false;
+        if (dx < 0 && prevMinX >= brickBounds.getMaxX()) {
+            fromRight = true;
+        }
+
+        // top / bottom
+        if (fromTop || fromBottom) {
+            ball.bounceY();
+
+            // left / right
+        } else if (fromLeft || fromRight) {
+            ball.bounceX();
+
+            // corner
+        } else {
+            ball.bounceX();
+            ball.bounceY();
+        }
+    }
+
+    private void explode(Brick explosiveBrick, List<Brick> bricks) {
+        double explositionRadius = 100.00; // ban kinh vu no
+        double explosiveCenterX = explosiveBrick.getX() + explosiveBrick.getWidth() / 2;
+        double explosiveCenterY = explosiveBrick.getY() + explosiveBrick.getHeight() / 2;
+
+        for (Brick other : bricks) {
+            if (other.isDestroyed() || other == explosiveBrick) {
+                continue;
+            }
+
+            double otherCenterX = other.getX() + other.getWidth() / 2;
+            double otherCenterY = other.getY() + other.getHeight() / 2;
+
+            double distance = Math.hypot(explosiveCenterX - otherCenterX,
+                    explosiveCenterY - otherCenterY);
+
+            if (distance <= explositionRadius && !(other instanceof UnbreakableBrick)) {
+                if (!other.isDestroyed()) {
+                    gameManager.increaseScore(other.getScore());
+                }
+                other.setDestroyed(true);
             }
         }
     }

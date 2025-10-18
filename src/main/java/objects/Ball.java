@@ -51,8 +51,9 @@ public class Ball extends MovableObject {
     public void resetSpeed() {
         double currentSpeed = Math.sqrt(dx * dx + dy * dy);
         if (currentSpeed > 0) {
-            dx = (dx / currentSpeed) * originalSpeed;
-            dy = (dy / currentSpeed) * originalSpeed;
+            dx = (dx / currentSpeed) * originalSpeed * Math.sqrt(2);
+            dy = (dy / currentSpeed) * originalSpeed * Math.sqrt(2);
         }
     }
+
 }
