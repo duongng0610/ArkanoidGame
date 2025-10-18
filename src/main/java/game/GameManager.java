@@ -246,6 +246,5 @@ public class GameManager {
         score += amount;
         gameView.getRenderer().updateScore(score);
     }
-
 }
 
