@@ -19,7 +19,7 @@ public class FastBallPowerUp extends PowerUp {
 
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
-        ball.multiplySpeed(1.5);
+        ball.multiplySpeed(1.25);
 
         // Tạo một thread mới để reset tốc độ sau 10 giây
         new Thread(() -> {

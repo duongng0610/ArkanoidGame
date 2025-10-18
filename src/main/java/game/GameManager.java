@@ -214,7 +214,8 @@ public class GameManager {
             // delay 3s to return menu
             returnToMenu(3000);
         } else {
-            gameView.getRenderer().showMessage("LEVEL " + (currentLevel - 1) + " CLEARD!");
+            gameView.getRenderer().showMessage("LEVEL " + currentLevel + " CLEARD!");
+            currentLevel++;
             // delay 2s to go to next level
             returnToNextLeve(2000);
         }

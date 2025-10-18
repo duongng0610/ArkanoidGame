@@ -1,8 +1,6 @@
 package controller;
 
-import objects.Brick;
-import objects.NormalBrick;
-import objects.StrongBrick;
+import objects.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -59,6 +57,8 @@ public class LevelManager {
         switch (types) {
             case "1" : return new NormalBrick(x, y);
             case "2" : return new StrongBrick(x, y);
+            case "U": return new UnbreakableBrick(x, y);
+            case "E": return new ExplosiveBrick(x, y);
 
             default: return null;
         }

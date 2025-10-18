@@ -56,4 +56,8 @@ public abstract class Brick extends GameObject {
     public Bounds getBounds() {
         return view.getBoundsInParent();
     }
+
+    public void setDestroyed(boolean b) {
+        this.isDestroyed = b;
+    }
 }
