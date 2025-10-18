@@ -115,7 +115,16 @@ public class GameManager {
             double x = brick.getX() + (brick.getWidth() / 2) - (Constants.POWER_UP_SIZE / 2);
             double y = brick.getY();
 
-            PowerUp powerUp = new ExpandPaddlePowerUp(x, y);
+            PowerUp powerUp;
+            double rand = Math.random();
+
+            // 50% ra Expand, 50% ra FastBall
+            if (rand < 0.5) {
+                powerUp = new ExpandPaddlePowerUp(x, y);
+            } else {
+                powerUp = new FastBallPowerUp(x, y);
+            }
+
             powerUps.add(powerUp);
             gameView.getGamePane().getChildren().add(powerUp.getView());
         }

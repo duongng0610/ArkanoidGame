@@ -14,7 +14,7 @@ public class ExpandPaddlePowerUp extends PowerUp {
     }
 
     @Override
-    public void applyEffect(Paddle paddle) {
+    public void applyEffect(Paddle paddle, Ball ball) {
         paddle.expand();
     }
 }

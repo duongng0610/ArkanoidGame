@@ -21,5 +21,5 @@ public abstract class PowerUp extends MovableObject {
         return view.getBoundsInParent();
     }
 
-    public abstract void applyEffect(Paddle paddle);
+    public abstract void applyEffect(Paddle paddle, Ball ball);
 }

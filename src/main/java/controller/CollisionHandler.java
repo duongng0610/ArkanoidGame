@@ -22,7 +22,7 @@ public class CollisionHandler {
         checkWallCollision(ball);
         checkPaddleCollision(ball, paddle);
         checkBrickCollisions(ball, bricks);
-        checkPowerUpCollision(paddle, powerUps);
+        checkPowerUpCollision(paddle, ball, powerUps);
     }
 
     // Wall <-> Ball
@@ -165,7 +165,7 @@ public class CollisionHandler {
     }
 
     // Paddle <-> PowerUp
-    private void checkPowerUpCollision(Paddle paddle, List<PowerUp> powerUps) {
+    private void checkPowerUpCollision(Paddle paddle,Ball ball, List<PowerUp> powerUps) {
         for (PowerUp powerUp : powerUps) {
             if (powerUp.isCollected()) {
                 continue;
@@ -173,7 +173,7 @@ public class CollisionHandler {
 
             // only top collision
             if(paddle.getBounds().intersects(powerUp.getBounds())) {
-                powerUp.applyEffect(paddle);
+                powerUp.applyEffect(paddle, ball);
                 powerUp.collect();
             }
         }
