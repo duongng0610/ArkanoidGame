@@ -2,17 +2,19 @@ package game;
 
 import controller.CollisionHandler;
 import controller.InputHandler;
-import javafx.scene.Node;
-import objects.*;
-import util.Constants;
-import view.GameView;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import controller.LevelManager;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import objects.*;
+import util.Constants;
+import view.GameView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameManager {
     private AnimationTimer gameLoop;
@@ -21,26 +23,30 @@ public class GameManager {
     private Paddle paddle;
     private Ball ball;
     private InputHandler inputHandler;
+    private LevelManager levelManager;
     private Main mainApp;
     private List<Brick> bricks;
     private List<PowerUp> powerUps;
     private CollisionHandler collisionHandler;
     private int score;
     private int lives;
+    private int currentLevel;
 
     public GameManager(GameView gameView, Main mainApp) {
         this.gameView = gameView;
         this.mainApp = mainApp;
         this.bricks = new ArrayList<>();
         this.powerUps = new ArrayList<>();
+        this.levelManager = new LevelManager();
         this.collisionHandler = new CollisionHandler(this);
     }
 
     public void start() {
+        this.currentLevel = 1;
         this.score = 0;
         this.lives = Constants.INITIAL_LIVES;
         this.isRunning = true;
-        setupGame();
+        setupLevel();
 
         gameLoop = new AnimationTimer() {
             @Override
@@ -51,11 +57,13 @@ public class GameManager {
         gameLoop.start();
     }
 
-    private void setupGame() {
+    private void setupLevel() {
         // clear (not contain Canvas)
         gameView.getGamePane().getChildren().removeIf(node -> !(node instanceof Canvas));
         bricks.clear();
         powerUps.clear();
+
+        gameView.getRenderer().hideMessage();
 
         double paddleX = (Constants.SCREEN_WIDTH - Constants.PADDLE_WIDTH) / 2;
         paddle = new Paddle(paddleX, Constants.PADDLE_START_Y);
@@ -64,27 +72,13 @@ public class GameManager {
 
         ball = new Ball(paddleX + (Constants.PADDLE_WIDTH / 2) - Constants. BALL_RADIUS,
                 Constants.PADDLE_START_Y - Constants.BALL_RADIUS * 2 - 30);
+        bricks.addAll(levelManager.loadLevel(currentLevel));
 
-
-        //SETUP BRICK
-        for (int row = 0; row < 5; row++) {
-            for (int col = 0; col < 10; col++) {
-                double x = Constants.BRICK_START_X + col * (Constants.BRICK_WIDTH + Constants.BRICK_GAP_X);
-                double y = Constants.BRICK_START_Y + row * (Constants.BRICK_HEIGHT + Constants.BRICK_GAP_Y);
-
-                Brick brick;
-
-                if (row < 2) {
-                    brick = new StrongBrick(x, y);
-                } else {
-                    brick = new NormalBrick(x, y);
-                }
-                bricks.add(brick);
-            }
-        }
 
         gameView.getGamePane().getChildren().addAll(paddle.getView(), ball.getView());
-        bricks.forEach(brick -> gameView.getGamePane().getChildren().add(brick.getView()));
+        for (Brick brick : bricks) {
+            gameView.getGamePane().getChildren().add(brick.getView());
+        }
 
         inputHandler = new InputHandler(gameView.getScene(), paddle);
 
@@ -208,18 +202,26 @@ public class GameManager {
         isRunning = false;
         gameLoop.stop();
         gameView.getRenderer().showMessage("Game Over");
-        returnToMenuAfterDelay(3000);
+        returnToMenu(3000);
     }
 
     private void winGame() {
         isRunning = false;
         gameLoop.stop();
-        gameView.getRenderer().showMessage("You Win!");
-        returnToMenuAfterDelay(3000);
+
+        if (currentLevel > Constants.MAX_LEVEL) {
+            gameView.getRenderer().showMessage("You Win!");
+            // delay 3s to return menu
+            returnToMenu(3000);
+        } else {
+            gameView.getRenderer().showMessage("LEVEL " + (currentLevel - 1) + " CLEARD!");
+            // delay 2s to go to next level
+            returnToNextLeve(2000);
+        }
     }
 
     // Make a delay when go to menu
-    private void returnToMenuAfterDelay(long delayMillis) {
+    private void returnToMenu(long delayMillis) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -228,6 +230,24 @@ public class GameManager {
             }
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> mainApp.showMenu()));
+        new Thread(task).start();
+    }
+
+    // Make a delay when go to a new level
+    private void returnToNextLeve(long delayMillis) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(delayMillis);
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            isRunning = true;
+            setupLevel();
+            gameLoop.start();
+        }));
         new Thread(task).start();
     }
 

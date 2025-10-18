@@ -1,7 +1,5 @@
 package util;
 
-import objects.PowerUp;
-
 public class Constants {
     // Screen
     public static final int SCREEN_WIDTH = 800;
@@ -41,4 +39,7 @@ public class Constants {
 
     // Lives
     public static final int INITIAL_LIVES = 3;
+
+    // Level
+    public static final int MAX_LEVEL = 3;
 }
