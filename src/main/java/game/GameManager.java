@@ -66,6 +66,7 @@ public class GameManager {
                 Constants.PADDLE_START_Y - Constants.BALL_RADIUS * 2 - 30);
 
 
+        //SETUP BRICK
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 10; col++) {
                 double x = Constants.BRICK_START_X + col * (Constants.BRICK_WIDTH + Constants.BRICK_GAP_X);

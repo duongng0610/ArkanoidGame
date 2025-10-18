@@ -24,7 +24,6 @@ javafx {
 
 application {
     mainClass = 'game.Main'
-
 }
 
 java {
