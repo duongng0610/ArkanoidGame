@@ -15,7 +15,7 @@ public class Constants {
 
     // Ball
     public static final double BALL_RADIUS = 7.5;
-    public static final double BALL_SPEED = 3.0;
+    public static final double BALL_SPEED = 5.0;
 
     // Brick
     public static final double BRICK_WIDTH = 60;
