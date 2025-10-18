@@ -8,12 +8,15 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.TextInputDialog;
+import managers.HighScoreManager;
 import objects.*;
 import util.Constants;
 import view.GameView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameManager {
@@ -28,6 +31,7 @@ public class GameManager {
     private List<Brick> bricks;
     private List<PowerUp> powerUps;
     private CollisionHandler collisionHandler;
+    private HighScoreManager highScoreManager;
     private int score;
     private int lives;
     private int currentLevel;
@@ -40,6 +44,7 @@ public class GameManager {
         this.powerUps = new ArrayList<>();
         this.levelManager = new LevelManager();
         this.collisionHandler = new CollisionHandler(this);
+        this.highScoreManager = new HighScoreManager();
     }
 
     public void start() {
@@ -203,7 +208,24 @@ public class GameManager {
         isRunning = false;
         gameLoop.stop();
         gameView.getRenderer().showMessage("Game Over");
-        returnToMenu(3000);
+
+        // Dùng Platform.runLater để đảm bảo dialog hiển thị đúng lúc
+        Platform.runLater(() -> {
+            TextInputDialog dialog = new TextInputDialog("Player");
+            dialog.setTitle("Game Over");
+            dialog.setHeaderText("Your score: " + score);
+            dialog.setContentText("Enter your name:");
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(name -> {
+                new HighScoreManager().addScore(name, score);
+                returnToMenu(500);
+            });
+            // Nếu người dùng đóng dialog, quay về menu
+            if (result.isEmpty()) {
+                returnToMenu(500);
+            }
+        });
     }
 
     private void winGame() {
