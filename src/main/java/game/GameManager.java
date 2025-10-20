@@ -2,21 +2,21 @@ package game;
 
 import controller.CollisionHandler;
 import controller.InputHandler;
-import controller.LevelManager;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
 import managers.HighScoreManager;
+import managers.LevelManager;
 import objects.*;
 import util.Constants;
+import util.ImgLoader;
 import view.GameView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameManager {
@@ -29,6 +29,7 @@ public class GameManager {
     private LevelManager levelManager;
     private Main mainApp;
     private List<Brick> bricks;
+    private List<Image> backgroundImages;
     private List<PowerUp> powerUps;
     private CollisionHandler collisionHandler;
     private HighScoreManager highScoreManager;
@@ -44,7 +45,9 @@ public class GameManager {
         this.powerUps = new ArrayList<>();
         this.levelManager = new LevelManager();
         this.collisionHandler = new CollisionHandler(this);
-        this.highScoreManager = new HighScoreManager();
+        this.highScoreManager = HighScoreManager.getInstance();
+        this.currentLevel = 1;
+        loadBackgrounds();
     }
 
     public void start() {
@@ -63,6 +66,14 @@ public class GameManager {
         gameLoop.start();
     }
 
+    // Load Background
+    private void loadBackgrounds() {
+        backgroundImages = new ArrayList<>();
+        backgroundImages.add(ImgLoader.loadImage("/assets/levels/bg1.png"));
+        backgroundImages.add(ImgLoader.loadImage("/assets/levels/bg2.png"));
+        backgroundImages.add(ImgLoader.loadImage("/assets/levels/bg3.png"));
+    }
+
     private void setupLevel() {
         // clear (not contain Canvas)
         gameView.getGamePane().getChildren().removeIf(node -> !(node instanceof Canvas));
@@ -70,6 +81,13 @@ public class GameManager {
         powerUps.clear();
 
         gameView.getRenderer().hideMessage();
+
+        if (!backgroundImages.isEmpty()) {
+            // When num of levels is bigger than num of background
+            int bgIndex = (currentLevel - 1) % backgroundImages.size();
+            Image bg = backgroundImages.get(bgIndex);
+            gameView.setBackground(bg);
+        }
 
         double paddleX = (Constants.SCREEN_WIDTH - Constants.PADDLE_WIDTH) / 2;
         paddle = new Paddle(paddleX, Constants.PADDLE_START_Y);
@@ -209,35 +227,26 @@ public class GameManager {
         gameLoop.stop();
         gameView.getRenderer().showMessage("Game Over");
 
-        // Dùng Platform.runLater để đảm bảo dialog hiển thị đúng lúc
-        Platform.runLater(() -> {
-            TextInputDialog dialog = new TextInputDialog("Player");
-            dialog.setTitle("Game Over");
-            dialog.setHeaderText("Your score: " + score);
-            dialog.setContentText("Enter your name:");
+        String levelId = "level" + currentLevel;
+        highScoreManager.updateHighScore(levelId, this.score);
 
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(name -> {
-                new HighScoreManager().addScore(name, score);
-                returnToMenu(500);
-            });
-            // Nếu người dùng đóng dialog, quay về menu
-            if (result.isEmpty()) {
-                returnToMenu(500);
-            }
-        });
+        returnToMenu(3000);
     }
 
     private void winGame() {
         isRunning = false;
         gameLoop.stop();
 
-        if (currentLevel > Constants.MAX_LEVEL) {
+        // update score
+        String levelId = "level" + currentLevel;
+        highScoreManager.updateHighScore(levelId, this.score);
+
+        if (currentLevel >= Constants.MAX_LEVEL) {
             gameView.getRenderer().showMessage("You Win!");
             // delay 3s to return menu
             returnToMenu(3000);
         } else {
-            gameView.getRenderer().showMessage("LEVEL " + currentLevel + " CLEARD!");
+            gameView.getRenderer().showMessage("LEVEL " + currentLevel + " CLEARD");
             currentLevel++;
             // delay 2s to go to next level
             returnToNextLeve(2000);

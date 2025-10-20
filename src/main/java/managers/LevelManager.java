@@ -1,4 +1,4 @@
-package controller;
+package managers;
 
 import objects.*;
 import org.json.JSONArray;

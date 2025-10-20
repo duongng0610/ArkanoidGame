@@ -1,68 +1,120 @@
 package managers;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class HighScoreManager {
-    private static final String HIGHSCORE_FILE = "highscores.dat";
-    private List<ScoreEntry> scores;
-    private static final int MAX_SCORES = 10; // Giới hạn chỉ lưu 10 điểm cao nhất
+    private static final HighScoreManager INSTANCE = new HighScoreManager();
+    private static final String HIGHSCORE_FILE = "level_scores.dat";
+    private static final String SECRET_KEY = "MySecretKey123*";
 
-    // Lớp nội bộ để lưu cặp tên-điểm
-    public static class ScoreEntry implements Serializable {
-        private final String name;
-        private final int score;
-        public ScoreEntry(String name, int score) { this.name = name; this.score = score; }
-        public String getName() { return name; }
-        public int getScore() { return score; }
+    private Map<String, Integer> verifiedScores;
+    private Properties properties;
+
+
+    private HighScoreManager() {
+        this.properties = new Properties();
+        this.verifiedScores = new HashMap<>();
+        loadHighScore();
     }
 
-    public List<ScoreEntry> loadScores() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(HIGHSCORE_FILE))) {
-            return (List<ScoreEntry>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            // Đây là lần đầu chạy game, file chưa tồn tại, trả về danh sách rỗng là đúng.
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error loading high scores: " + e.getMessage());
-            return new ArrayList<>(); // Trả về rỗng nếu có lỗi
+    public static HighScoreManager getInstance() {
+        return INSTANCE;
+    }
+
+    // Load data
+    private void loadHighScore() {
+        File file = new File(HIGHSCORE_FILE);
+        if (!file.exists()) {
+            return;
         }
-    }
 
-    private void saveScores(List<ScoreEntry> scores) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(HIGHSCORE_FILE))) {
-            oos.writeObject(scores);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            properties.load(fis);
         } catch (IOException e) {
-            System.err.println("Error saving high scores: " + e.getMessage());
+            System.err.println(e.getMessage());
+            return;
+        }
+
+        for (String key : properties.stringPropertyNames()) {
+            if (key.endsWith("_score")) {
+                String levelId = key.replace("_score", "");
+                String scoreStr = properties.getProperty(key);
+                String hashFromfile = properties.getProperty(levelId + "_hash");
+
+                if (hashFromfile != null && verifyHash(scoreStr, hashFromfile)) {
+                    verifiedScores.put(levelId, Integer.parseInt(scoreStr));
+                } else {
+                    System.out.println("Data is not suitable");
+                }
+            }
         }
     }
 
-
-    public HighScoreManager() {
-        scores = loadScores();
-    }
-
-    public List<ScoreEntry> getScores() { return scores; }
-
-    public void addScore(String name, int newScore) {
-        if (newScore <= 0) return; // Không lưu điểm 0
-
-        List<ScoreEntry> scores = loadScores();
-        scores.add(new ScoreEntry(name, newScore));
-
-        // Sắp xếp danh sách giảm dần theo điểm
-        scores.sort(Comparator.comparingInt(ScoreEntry::getScore).reversed());
-
-        // Chỉ giữ lại 10 điểm cao nhất
-        if (scores.size() > MAX_SCORES) {
-            scores = scores.subList(0, MAX_SCORES);
+    private void saveHighScore() {
+        try (FileOutputStream fos = new FileOutputStream(HIGHSCORE_FILE)) {
+            properties.store(fos, "Per-Level High Scores");
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
-
-        saveScores(scores);
-        System.out.println("High score saved: " + newScore);
     }
 
-    // Phương thức saveScores và loadScores sử dụng ObjectOutputStream/ObjectInputStream
-    // (Như code mẫu đã cung cấp trước đó)
+    public int getHighScore(String levelId) {
+        return verifiedScores.getOrDefault(levelId, 0);
+    }
+
+    // For Menu to show all high scores in levels
+    public Map<String, Integer> getAllHighScores() {
+        return new HashMap<>(verifiedScores);
+    }
+
+    public void updateHighScore(String levelId, int newScore) {
+        int currentHighScore = getHighScore(levelId);
+
+        if (newScore > currentHighScore) {
+            verifiedScores.put(levelId, newScore);
+            String newHash = caculateHash(String.valueOf(newScore));
+
+            properties.setProperty(levelId + "_score", String.valueOf(newScore));
+            properties.setProperty(levelId + "_hash", newHash);
+
+            saveHighScore();
+        }
+    }
+
+    // Calculate the hash by algorithm SHA 256
+    private String caculateHash(String data) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            String textToHash = data + SECRET_KEY;
+            byte[] hashBytes = digest.digest(textToHash.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Check the cheat when data in file is changed
+    private boolean verifyHash(String data, String hashFromFile) {
+        String newlyCalculateHash = caculateHash(data);
+        return newlyCalculateHash.equals(hashFromFile);
+    }
 }
-

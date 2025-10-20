@@ -1,17 +1,26 @@
 package objects;
 
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import util.Constants;
+import util.ImgLoader;
 
 public class ExpandPaddlePowerUp extends PowerUp {
-    public ExpandPaddlePowerUp(double x, double y) {
-        super(x, y, Constants.POWER_UP_SIZE, Constants.POWER_SPEED);
+    private static final Image IMAGE = ImgLoader.loadImage("/assets/power_up/crusher.png");
 
-        this.view = new Rectangle(width, height, Color.LIGHTGREEN);
-        this.view.setTranslateX(x);
-        this.view.setTranslateY(y);
+    public ExpandPaddlePowerUp(double x, double y) {
+        super(x, y, Constants.POWER_SPEED);
+        // load Image
+        this.view = new ImageView(IMAGE);
+
+        // set size
+        this.view.setFitWidth(Constants.POWER_UP_SIZE);
+        this.view.setFitHeight(Constants.POWER_UP_SIZE);
+
+        // set position
+        this.view.setLayoutX(x);
+        this.view.setLayoutY(y);
     }
 
     @Override

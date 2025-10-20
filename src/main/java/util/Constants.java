@@ -18,9 +18,9 @@ public class Constants {
     // Brick
     public static final double BRICK_WIDTH = 60;
     public static final double BRICK_HEIGHT = 20;
-    public static final double BRICK_GAP_X = 10;
-    public static final double BRICK_GAP_Y = 5;
-    public static final double BRICK_START_X = 50;
+    public static final double BRICK_GAP_X = 20;
+    public static final double BRICK_GAP_Y = 10;
+    public static final double BRICK_START_X = 10;
     public static final double BRICK_START_Y = 50;
 
 

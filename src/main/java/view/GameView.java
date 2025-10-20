@@ -1,30 +1,37 @@
 package view;
 
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import util.Constants;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class GameView {
     private Scene scene;
     private Pane gamePane;
     private Canvas hudCanvas; // Draw Scores, Lives
     private GameRenderer renderer;
+
     public GameView() {
-        // main space
         gamePane = new Pane();
-        gamePane.setStyle("-fx-background-color: black;");
+        setupHUD();
+        scene = new Scene(gamePane, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+    }
 
-        hudCanvas = new Canvas(800, 600);
+     public void setBackground(Image backgroundImage) {
+        BackgroundSize backgroundSize = new BackgroundSize(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT,
+                false, false, false, false);
+
+        BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+
+        gamePane.setBackground(new Background(background));
+    }
+
+    private void setupHUD() {
+        hudCanvas = new Canvas(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         gamePane.getChildren().add(hudCanvas);
-
         renderer = new GameRenderer(hudCanvas);
-
-        scene = new Scene(gamePane, 800, 600, Color.BLACK);
     }
 
     public Pane getGamePane() {

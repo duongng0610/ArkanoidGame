@@ -1,14 +1,13 @@
 package objects;
 
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
 
 public abstract class GameObject {
     protected double x, y;
     protected double width, height;
-    protected Node view;
+    protected ImageView view;
 
     public GameObject(double x, double y, double width, double height) {
         this.x = x;
@@ -18,9 +17,6 @@ public abstract class GameObject {
     }
 
     // Getter & Setter
-    public Node getView() {
-        return view;
-    }
 
     public double getX() {
         return x;
@@ -49,6 +45,14 @@ public abstract class GameObject {
     public void setPosition(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Node getView() {
+        return view;
+    }
+
+    public Bounds getBounds() {
+        return view.getBoundsInParent();
     }
 
 }

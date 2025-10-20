@@ -1,34 +1,43 @@
 package objects;
 
 import javafx.geometry.Bounds;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import util.Constants;
-
-import javax.swing.*;
-import java.awt.*;
-
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import util.ImgLoader;
 
 
 public class Paddle extends GameObject {
+    private static final Image PADDLE_NORMAL_IMG = ImgLoader.loadImage("/assets/paddle/paddle.png");
+    private static final Image PADDLE_EXPAND_IMG = ImgLoader.loadImage("/assets/paddle/paddle_x2.png");
+
     public Paddle(double x, double y) {
         super(x, y, Constants.PADDLE_WIDTH, Constants.PADDLE_HEIGHT);
-        this.view = new Rectangle(width, height, Color.CYAN);
-        updateViewPosition();
+
+        // load Image
+        this.view = new ImageView(PADDLE_NORMAL_IMG);
+
+        // set size
+        this.view.setFitWidth(this.width);
+        this.view.setFitHeight(this.height);
+
+        // set position
+        this.view.setLayoutX(x);
+        this.view.setLayoutY(y);
     }
 
     public void moveLeft() {
         if (x > 0) {
             x -= Constants.PADDLE_SPEED;
+            view.setLayoutX(x);
         }
-        updateViewPosition();
     }
 
     public void moveRight() {
         if (x + width < Constants.SCREEN_WIDTH) {
             x += Constants.PADDLE_SPEED;
+            view.setLayoutX(x);
         }
-        updateViewPosition();
     }
 
     public Bounds getBounds() {
@@ -39,24 +48,17 @@ public class Paddle extends GameObject {
     public void expand() {
         this.width = Constants.PADDLE_EXPAND_WIDTH;
 
-        if (x + width > Constants.SCREEN_WIDTH) {
-            x = Constants.SCREEN_WIDTH - width;
-        }
-        updateViewPosition();
-    }
+        this.view.setImage(PADDLE_EXPAND_IMG);
 
-    private void updateViewPosition() {
-        if (view instanceof Rectangle rect) {
-            rect.setWidth(width);
-        }
-
-        view.setTranslateX(x);
-        view.setTranslateY(y);
+        this.view.setFitWidth(this.width);
     }
 
     public void resetSize() {
         this.width = Constants.PADDLE_WIDTH;
-        updateViewPosition();
+
+        this.view.setImage(PADDLE_NORMAL_IMG);
+
+        this.view.setFitWidth(this.width);
     }
 
 }

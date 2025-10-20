@@ -1,16 +1,15 @@
 package objects;
 
 import javafx.geometry.Bounds;
-import javafx.scene.shape.Circle;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import util.Constants;
-import javafx.scene.paint.Color;
-
-
-import java.awt.*;
+import util.ImgLoader;
 
 public class Ball extends MovableObject {
 
     private final double originalSpeed;
+    private final static Image IMAGE = ImgLoader.loadImage("/assets/ball/ball.png");
 
     public Ball (double x, double y) {
         super(x, y, Constants.BALL_RADIUS * 2, Constants.BALL_RADIUS * 2,
@@ -18,9 +17,21 @@ public class Ball extends MovableObject {
 
         this.originalSpeed = Constants.BALL_SPEED;
 
-        this.view = new Circle(Constants.BALL_RADIUS, Color.WHITE);
-        this.view.setTranslateX(x);
-        this.view.setTranslateY(y);
+        // load Image
+        this.view = new ImageView(IMAGE);
+
+        // set size
+        this.view.setFitHeight(this.width);
+        this.view.setFitHeight(this.height);
+
+        // set position
+        this.view.setLayoutX(x);
+        this.view.setLayoutY(y);
+
+        // set velocity
+        this.dx = Constants.BALL_SPEED;
+        this.dy = -Constants.BALL_SPEED;
+
     }
 
     public void bounceY() {

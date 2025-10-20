@@ -12,8 +12,8 @@ public abstract class MovableObject extends GameObject{
     public void move() {
         x += dx;
         y += dy;
-        view.setTranslateX(x);
-        view.setTranslateY(y);
+        view.setLayoutX(x);
+        view.setLayoutY(y);
     }
 
     // Getter & Setter
