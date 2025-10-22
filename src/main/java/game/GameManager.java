@@ -55,11 +55,10 @@ public class GameManager {
         this.score = 0;
         this.lives = Constants.INITIAL_LIVES;
         this.isRunning = true;
-<<<<<<< HEAD
+
         // Reset title menu về mặc định khi start game
         mainApp.resetMenuTitle();
-=======
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
+
         setupLevel();
 
         gameLoop = new AnimationTimer() {
@@ -103,10 +102,6 @@ public class GameManager {
                 Constants.PADDLE_START_Y - Constants.BALL_RADIUS * 2 - 30);
         bricks.addAll(levelManager.loadLevel(currentLevel));
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         gameView.getGamePane().getChildren().addAll(paddle.getView(), ball.getView());
         for (Brick brick : bricks) {
             gameView.getGamePane().getChildren().add(brick.getView());
@@ -210,10 +205,6 @@ public class GameManager {
         powerUps.removeAll(used);
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
     private void checkGameState() {
         if (bricks.isEmpty()) {
             winGame();
@@ -236,20 +227,13 @@ public class GameManager {
     private void gameOver() {
         isRunning = false;
         gameLoop.stop();
-<<<<<<< HEAD
-        String levelId = "level" + currentLevel;
-        highScoreManager.updateHighScore(levelId, this.score);
 
-        // Delay 2 seconds before showing "Game Over" in the menu
-        returnToMenuWithGameOver(1500);
-=======
         gameView.getRenderer().showMessage("Game Over");
 
         String levelId = "level" + currentLevel;
         highScoreManager.updateHighScore(levelId, this.score);
 
-        returnToMenu(3000);
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
+        returnToMenu(2000);
     }
 
     private void winGame() {
@@ -265,11 +249,7 @@ public class GameManager {
             // delay 3s to return menu
             returnToMenu(3000);
         } else {
-<<<<<<< HEAD
-            gameView.getRenderer().showMessage("LEVEL " + currentLevel + " CLEARED");
-=======
             gameView.getRenderer().showMessage("LEVEL " + currentLevel + " CLEARD");
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
             currentLevel++;
             // delay 2s to go to next level
             returnToNextLeve(2000);
@@ -289,7 +269,6 @@ public class GameManager {
         new Thread(task).start();
     }
 
-<<<<<<< HEAD
     // Method to delay and set title "Game Over"
     private void returnToMenuWithGameOver(long delayMillis) {
         Task<Void> task = new Task<>() {
@@ -306,8 +285,6 @@ public class GameManager {
         new Thread(task).start();
     }
 
-=======
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
     // Make a delay when go to a new level
     private void returnToNextLeve(long delayMillis) {
         Task<Void> task = new Task<Void>() {
@@ -342,10 +319,5 @@ public class GameManager {
             gameLoop.start();
         }
     }
-<<<<<<< HEAD
-}
-=======
-
 }
 
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50

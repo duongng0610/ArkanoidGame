@@ -28,14 +28,9 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-<<<<<<< HEAD
-    public void startGame() {
-        gameView = new GameView();  // Khởi tạo gameView ở đây để tránh null
-=======
 
     public void startGame() {
         GameView gameView = new GameView();
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
 
         gameManager = new GameManager(gameView, this);
 
@@ -52,7 +47,6 @@ public class Main extends Application {
         Platform.exit();
     }
 
-<<<<<<< HEAD
     // Method để set title menu
     public void setMenuTitle(String text) {
         if (menuView != null) {
@@ -66,6 +60,5 @@ public class Main extends Application {
             menuView.resetTitle();
         }
     }
-=======
->>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
+
 }
