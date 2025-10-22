@@ -1,0 +1,13 @@
+{
+  "levelNumber": 3,
+  "levelName": "The Maze",
+  "layout": [
+    "2 2 2 2 E 2 2 2 2 2",
+    "U U U U 1 U U U U U",
+    "1 1 2 1 1 1 2 1 1 1",
+    "1 U 2 U 2 U 2 U 2 U",
+    "1 1 2 1 E 1 2 1 1 1",
+    "U U U U 1 U U U U U",
+    "2 1 1 1 1 1 1 1 1 2"
+  ]
+}
