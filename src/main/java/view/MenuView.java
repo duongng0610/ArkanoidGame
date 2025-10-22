@@ -1,7 +1,10 @@
 package view;
 
 import game.Main;
+<<<<<<< HEAD
 import javafx.animation.AnimationTimer;
+=======
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -9,15 +12,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+<<<<<<< HEAD
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+=======
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
 import javafx.scene.layout.VBox;
 import managers.HighScoreManager;
 import util.Constants;
 import util.ImgLoader;
+<<<<<<< HEAD
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
+=======
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,12 +37,16 @@ public class MenuView {
     private Scene scene;
     private Main mainApp;
     private HighScoreManager highScoreManager;
+<<<<<<< HEAD
     private Label titleLabel;  // Field để truy cập và thay đổi title
+=======
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
 
     public MenuView(Main mainApp) {
         this.mainApp = mainApp;
         this.highScoreManager = HighScoreManager.getInstance();
 
+<<<<<<< HEAD
         // Create the main layout with StackPane
         StackPane root = new StackPane();
 
@@ -61,6 +75,12 @@ public class MenuView {
         titleLabel.setTranslateY(-20); // Move title up by 20 pixels
 
         // Buttons
+=======
+        // Background of Menu
+        VBox menu = loadBackground("/assets/menu/menu.png");
+
+        // Button
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         Button startButton = createButtonWithImage("/assets/menu/start.png");
         Button highScoresButton = createButtonWithImage("/assets/menu/score.png");
         Button exitButton = createButtonWithImage("/assets/menu/exit.png");
@@ -69,6 +89,7 @@ public class MenuView {
         exitButton.setOnAction(e -> this.mainApp.exitGame());
         highScoresButton.setOnAction(e -> showHighScores());
 
+<<<<<<< HEAD
         // Add title and buttons to buttonLayout
         buttonLayout.getChildren().addAll(titleLabel, startButton, highScoresButton, exitButton);
 
@@ -140,10 +161,32 @@ public class MenuView {
         }
 
         return backgroundContainer;
+=======
+        menu.getChildren().addAll(startButton,highScoresButton, exitButton);
+
+        scene = new Scene(menu, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+    }
+
+    private VBox loadBackground(String imagePath) {
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+
+        if (imagePath != null) {
+            layout.setStyle(
+                    "-fx-background-image: url('" + imagePath + "'); " +
+                            "-fx-background-size: cover;"
+            );
+        } else {
+            layout.setStyle("-fx-background-color: black;");
+        }
+
+        return layout;
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
     }
 
     private Button createButtonWithImage(String imagePath) {
         Image img = ImgLoader.loadImage(imagePath);
+<<<<<<< HEAD
         ImageView imageView = new ImageView(img);
         imageView.setFitHeight(50);
         imageView.setPreserveRatio(true);
@@ -151,23 +194,48 @@ public class MenuView {
         // Put Img into button
         button.setGraphic(imageView);
         // Make button background transparent
+=======
+
+        ImageView imageView = new ImageView(img);
+
+        imageView.setFitHeight(50);
+        imageView.setPreserveRatio(true);
+
+        Button button = new Button();
+        // put Img into button
+        button.setGraphic(imageView);
+
+        // blur the background of button
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         button.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
         return button;
     }
 
     private void showHighScores() {
         Map<String, Integer> scores = highScoreManager.getAllHighScores();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         StringBuilder scoreText = new StringBuilder("HIGH SCORES:\n\n");
         if (scores.isEmpty()) {
             scoreText.append("No score yet");
         } else {
             List<String> sortedLevels = new ArrayList<String>(scores.keySet());
             Collections.sort(sortedLevels);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
             for (String levelId : sortedLevels) {
                 String levelNumber = levelId.replace("level", "");
                 scoreText.append(String.format("Level %s: %d%n", levelNumber, scores.get(levelId)));
             }
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         showHighScoresAlert(scoreText.toString());
     }
 
@@ -176,8 +244,15 @@ public class MenuView {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("High Scores");
         alert.setHeaderText(null);
+<<<<<<< HEAD
         Label label = new Label(scoreText);
         label.setWrapText(true);
+=======
+
+        Label label = new Label(scoreText);
+        label.setWrapText(true);
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
         alert.getDialogPane().setContent(label);
         alert.showAndWait();
     }
@@ -185,6 +260,7 @@ public class MenuView {
     public Scene getScene() {
         return scene;
     }
+<<<<<<< HEAD
 
     // Method để thay đổi text của titleLabel
     public void setTitleText(String text) {
@@ -200,3 +276,7 @@ public class MenuView {
         }
     }
 }
+=======
+}
+
+>>>>>>> 2b193a40daaa8252b9a9c06e32c3819744377e50
