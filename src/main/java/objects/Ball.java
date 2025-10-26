@@ -42,6 +42,7 @@ public class Ball extends MovableObject {
         dx = -dx;
     }
 
+    // reset ball to default status
     public void reset(double paddleX, double paddleWidth) {
         setX(paddleX + (paddleWidth / 2) - Constants.BALL_RADIUS);
         setY(Constants.PADDLE_START_Y - Constants.BALL_RADIUS * 2);
@@ -59,6 +60,7 @@ public class Ball extends MovableObject {
         dy *= factor;
     }
 
+    // use normalize vector to reset originSpeed after speedup
     public void resetSpeed() {
         double currentSpeed = Math.sqrt(dx * dx + dy * dy);
         if (currentSpeed > 0) {

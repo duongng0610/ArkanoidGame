@@ -24,4 +24,17 @@ public class ExplosiveBrick extends Brick {
         this.view.setLayoutX(this.x);
         this.view.setLayoutY(this.y);
     }
+
+    @Override
+    public void takeHit() {
+        if (isDestroyed) {
+            return;
+        }
+
+        hitPoints--;
+        if (hitPoints <= 0) {
+            isDestroyed = true;
+        }
+    }
+
 }

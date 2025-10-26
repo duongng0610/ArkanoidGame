@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import managers.HighScoreManager;
 import managers.LevelManager;
+import managers.SoundManager;
 import objects.*;
 import util.Constants;
 import util.ImgLoader;
@@ -31,8 +32,10 @@ public class GameManager {
     private List<Brick> bricks;
     private List<Image> backgroundImages;
     private List<PowerUp> powerUps;
+    private List<Meteorite> meteorites;
     private CollisionHandler collisionHandler;
     private HighScoreManager highScoreManager;
+    private SoundManager soundManager;
     private int score;
     private int lives;
     private int currentLevel;
@@ -43,9 +46,11 @@ public class GameManager {
         this.mainApp = mainApp;
         this.bricks = new ArrayList<>();
         this.powerUps = new ArrayList<>();
+        this.meteorites = new ArrayList<>();
         this.levelManager = new LevelManager();
         this.collisionHandler = new CollisionHandler(this);
         this.highScoreManager = HighScoreManager.getInstance();
+        this.soundManager = SoundManager.getInstance();
         this.currentLevel = 1;
         loadBackgrounds();
     }
@@ -56,7 +61,7 @@ public class GameManager {
         this.lives = Constants.INITIAL_LIVES;
         this.isRunning = true;
 
-        // Reset title menu về mặc định khi start game
+        // Reset to default title
         mainApp.resetMenuTitle();
 
         setupLevel();
@@ -83,6 +88,7 @@ public class GameManager {
         gameView.getGamePane().getChildren().removeIf(node -> !(node instanceof Canvas));
         bricks.clear();
         powerUps.clear();
+        meteorites.clear();
 
         gameView.getRenderer().hideMessage();
 
@@ -117,7 +123,7 @@ public class GameManager {
     private void update() {
         if (!isRunning || isPaused) return;
 
-        inputHandler.handleInput();
+        inputHandler.update();
 
         ball.move();
 
@@ -125,14 +131,32 @@ public class GameManager {
             powerUp.move();
         }
 
-        collisionHandler.checkCollisions(ball, paddle, bricks, powerUps);
+        for (Meteorite meteorite : meteorites) {
+            meteorite.move();
+        }
+
+        spawnMeteorite();
+
+        collisionHandler.checkCollisions(ball, paddle, bricks, powerUps, meteorites);
+
         removeUsedObjects();
         checkGameState();
     }
 
+    // spawn meteorite
+    private void spawnMeteorite() {
+        if (Math.random() < Constants.METEORITE_SPAWN_CHANCE) {
+            double x = Math.random() * (Constants.SCREEN_WIDTH - Constants.METEORITE_WIDTH);
+            Meteorite meteorite = new Meteorite(x, -Constants.METEORITE_HEIGHT);
+
+            meteorites.add(meteorite);
+            gameView.getGamePane().getChildren().add(meteorite.getView());
+        }
+    }
+
     // spawn powerup from brick which is destroyed
     public void spawnPowerUp(Brick brick) {
-        if (Math.random() < Constants.POWER_SPAWN_CHANE) {
+        if (Math.random() < Constants.POWER_SPAWN_CHANCE) {
             double x = brick.getX() + (brick.getWidth() / 2) - (Constants.POWER_UP_SIZE / 2);
             double y = brick.getY();
 
@@ -155,6 +179,7 @@ public class GameManager {
     private void removeUsedObjects() {
         removeDestroyedBricks();
         removeUsedPowerUps();
+        removeUsedMeteorites();
     }
 
     private void removeDestroyedBricks() {
@@ -205,13 +230,38 @@ public class GameManager {
         powerUps.removeAll(used);
     }
 
+    private void removeUsedMeteorites() {
+        List<Meteorite> used = meteorites.stream()
+                .filter(o -> o.isDestroyed() || o.getY() > Constants.SCREEN_HEIGHT)
+                .collect(Collectors.toList());
+
+        if (used.isEmpty()) {
+            return;
+        }
+
+        List<Node> views = new ArrayList<>();
+        for (Meteorite meteorite : used) {
+            Node view = meteorite.getView();
+            if (view != null) {
+                views.add(view);
+            }
+        }
+
+        // Remove from scene
+        gameView.getGamePane().getChildren().removeAll(views);
+
+        // Remove from logic
+        meteorites.removeAll(used);
+    }
+
     private void checkGameState() {
         if (bricks.isEmpty()) {
             winGame();
         }
     }
 
-    public void loseLife() {
+    // for meteorite when collision with paddle
+    public void loseLifeNoReset() {
         lives--;
         gameView.getRenderer().updateLives(lives);
         // Set the default size for paddle
@@ -219,7 +269,14 @@ public class GameManager {
 
         if (lives <= 0) {
             gameOver();
-        } else {
+        }
+    }
+
+    // for ball when go out screen
+    public void loseLife() {
+        loseLifeNoReset();
+
+        if (lives > 0) {
             ball.reset(paddle.getX(), paddle.getWidth());
         }
     }
@@ -228,12 +285,11 @@ public class GameManager {
         isRunning = false;
         gameLoop.stop();
 
-        gameView.getRenderer().showMessage("Game Over");
+        // update score
+        highScoreManager.updateHighScore(this.score);
 
-        String levelId = "level" + currentLevel;
-        highScoreManager.updateHighScore(levelId, this.score);
-
-        returnToMenu(2000);
+        // Delay 1 seconds before showing "Game Over" in the menu
+        returnToMenuWithGameOver(1000);
     }
 
     private void winGame() {
@@ -241,8 +297,7 @@ public class GameManager {
         gameLoop.stop();
 
         // update score
-        String levelId = "level" + currentLevel;
-        highScoreManager.updateHighScore(levelId, this.score);
+        highScoreManager.updateHighScore(this.score);
 
         if (currentLevel >= Constants.MAX_LEVEL) {
             gameView.getRenderer().showMessage("You Win!");
@@ -257,7 +312,7 @@ public class GameManager {
     }
 
     // Make a delay when go to menu
-    private void returnToMenu(long delayMillis) {
+    public void returnToMenu(long delayMillis) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -309,8 +364,13 @@ public class GameManager {
     }
 
     public void togglePause() {
-        if (!isRunning) return; // Không pause khi game chưa chạy
+        // can not pause when is not running
+        if (!isRunning) {
+            return;
+        }
+
         isPaused = !isPaused;
+
         if (isPaused) {
             gameLoop.stop();
             gameView.getRenderer().showMessage("PAUSED");

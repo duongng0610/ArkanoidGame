@@ -15,16 +15,7 @@ public abstract class Brick extends GameObject {
         this.score = score;
     }
 
-    public void takeHit() {
-        if (isDestroyed) {
-            return;
-        }
-
-        hitPoints--;
-        if (hitPoints <= 0) {
-            isDestroyed = true;
-        }
-    }
+    public abstract void takeHit();
 
     public boolean isDestroyed() {
         return isDestroyed;

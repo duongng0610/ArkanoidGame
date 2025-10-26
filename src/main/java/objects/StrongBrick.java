@@ -35,7 +35,7 @@ public class StrongBrick extends Brick {
             if (hitPoints <= 0) {
                 isDestroyed = true;
             } else {
-                // blur the img
+                // blur the img after collision with ball
                 double newOpacity = (double) hitPoints / initialHitPoints;
                 view.setOpacity(newOpacity);
             }

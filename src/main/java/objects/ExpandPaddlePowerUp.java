@@ -23,17 +23,19 @@ public class ExpandPaddlePowerUp extends PowerUp {
         this.view.setLayoutY(y);
     }
 
+    // using power
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
         paddle.expand();
-        // Tạo một thread mới để reset tốc độ sau 10 giây
+
+        // stop size up paddle after a time
         new Thread(() -> {
             try {
-                Thread.sleep(10000); // 10 giây
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // Phải chạy trên UI thread của JavaFX
+
             Platform.runLater(paddle::resetSize);
         }).start();
     }

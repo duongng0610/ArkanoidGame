@@ -6,9 +6,7 @@ import javafx.scene.image.ImageView;
 import util.Constants;
 import util.ImgLoader;
 
-/**
- * A power-up that temporarily increases the ball's speed.
- */
+
 public class FastBallPowerUp extends PowerUp {
     private static final Image IMAGE = ImgLoader.loadImage("/assets/power_up/speeder.png");
 
@@ -27,18 +25,19 @@ public class FastBallPowerUp extends PowerUp {
         this.view.setLayoutY(y);
     }
 
+    // using power
     @Override
     public void applyEffect(Paddle paddle, Ball ball) {
         ball.multiplySpeed(1.25);
 
-        // Tạo một thread mới để reset tốc độ sau 10 giây
+        // stop speedup ball speed after a time
         new Thread(() -> {
             try {
-                Thread.sleep(10000); // 10 giây
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // Phải chạy trên UI thread của JavaFX
+
             Platform.runLater(ball::resetSpeed);
         }).start();
     }

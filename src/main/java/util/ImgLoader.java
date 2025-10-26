@@ -8,6 +8,7 @@ public class ImgLoader {
 
     public static Image loadImage(String resourcePath) {
         try {
+            // find from resources file
             InputStream stream = ImgLoader.class.getResourceAsStream(resourcePath);
 
             if (stream == null) {
@@ -15,7 +16,7 @@ public class ImgLoader {
             }
             return new Image(stream);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load image: " + resourcePath, e);
+            throw new RuntimeException("Error loading image: " + resourcePath, e);
         }
     }
 }

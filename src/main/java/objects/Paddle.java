@@ -53,6 +53,7 @@ public class Paddle extends GameObject {
         this.view.setFitWidth(this.width);
     }
 
+    // reset to default size
     public void resetSize() {
         this.width = Constants.PADDLE_WIDTH;
 

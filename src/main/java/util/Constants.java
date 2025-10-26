@@ -36,13 +36,24 @@ public class Constants {
     // PowerUp
     public static final double POWER_UP_SIZE = 20;
     public static final double POWER_SPEED = 2.0;
-    public static final double POWER_SPAWN_CHANE = 0.2;
+    public static final double POWER_SPAWN_CHANCE = 0.2;
 
     public static final double PADDLE_EXPAND_WIDTH = 150;
 
+    // Meteorite
+    public static final double METEORITE_HEIGHT = 60;
+    public static final double METEORITE_WIDTH = 30;
+    public static final double METEORITE_SPEED = 2.0;
+    public static final double METEORITE_SPAWN_CHANCE = 0.005;
+
     // Lives
     public static final int INITIAL_LIVES = 3;
+    public static final int HEART_SIZE = 30;
+    public static final int HEART_GAP = 5;
+    public static final int HEART_PADDING = 20;
+    private static final double HEART_CLEAR_EXTRA = 10;
 
     // Level
     public static final int MAX_LEVEL = 3;
+
 }

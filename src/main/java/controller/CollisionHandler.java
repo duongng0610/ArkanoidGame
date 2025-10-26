@@ -2,6 +2,7 @@ package controller;
 
 import game.GameManager;
 import javafx.geometry.Bounds;
+import managers.SoundManager;
 import objects.*;
 import util.Constants;
 
@@ -10,16 +11,19 @@ import java.util.List;
 
 public class CollisionHandler {
     private GameManager gameManager;
+    private SoundManager soundManager;
 
     public CollisionHandler(GameManager gameManager) {
         this.gameManager = gameManager;
+        this.soundManager = SoundManager.getInstance();
     }
 
-    public void checkCollisions(Ball ball, Paddle paddle, List<Brick> bricks, List<PowerUp> powerUps) {
+    public void checkCollisions(Ball ball, Paddle paddle, List<Brick> bricks, List<PowerUp> powerUps, List<Meteorite> meteorites) {
         checkWallCollision(ball);
         checkPaddleCollision(ball, paddle);
         checkBrickCollisions(ball, bricks);
         checkPowerUpCollision(paddle, ball, powerUps);
+        checkMeteoriteCollision(ball, paddle, meteorites);
     }
 
     // Wall <-> Ball
@@ -27,10 +31,12 @@ public class CollisionHandler {
         // Left/Right
         if (ball.getX() <= 0 || ball.getX() + ball.getWidth() >= Constants.SCREEN_WIDTH) {
             ball.bounceX();
+            soundManager.playHit();
         }
         // Up
         if (ball.getY() <= 0) {
             ball.bounceY();
+            soundManager.playHit();
         }
         // Bottom
         if (ball.getY() + ball.getHeight() >= Constants.SCREEN_HEIGHT) {
@@ -43,6 +49,7 @@ public class CollisionHandler {
         if (ball.getBounds().intersects(paddle.getBounds())) {
             ball.setY(paddle.getY() - ball.getHeight());
             ball.bounceY();
+            soundManager.playHit();
         }
     }
 
@@ -58,6 +65,7 @@ public class CollisionHandler {
 
                 // ball bounce
                 handleBounce(ball, brick);
+                soundManager.playHit();
 
                 if (brick instanceof UnbreakableBrick) {
                     continue;
@@ -118,7 +126,6 @@ public class CollisionHandler {
         // top / bottom
         if (fromTop || fromBottom) {
             ball.bounceY();
-
             // left / right
         } else if (fromLeft || fromRight) {
             ball.bounceX();
@@ -130,8 +137,49 @@ public class CollisionHandler {
         }
     }
 
+    // Paddle <-> PowerUp
+    private void checkPowerUpCollision(Paddle paddle,Ball ball, List<PowerUp> powerUps) {
+        for (PowerUp powerUp : powerUps) {
+            if (powerUp.isCollected()) {
+                continue;
+            }
+
+            // only top collision
+            if(paddle.getBounds().intersects(powerUp.getBounds())) {
+                powerUp.applyEffect(paddle, ball);
+                powerUp.collect();
+            }
+        }
+    }
+
+    //Meteorite <--> Ball
+    public void checkMeteoriteCollision(Ball ball, Paddle paddle, List<Meteorite> meteorites) {
+
+        for (Meteorite meteorite : meteorites) {
+            if (meteorite.isDestroyed()) {
+                continue;
+            }
+
+            if (meteorite.getBounds().intersects(paddle.getBounds())) {
+                gameManager.loseLifeNoReset();
+                meteorite.setDestroyed(true);
+
+                // skip collision with other object
+                continue;
+            }
+
+            if (meteorite.getBounds().intersects(ball.getBounds())) {
+                ball.bounceY();
+                meteorite.setDestroyed(true);
+
+                soundManager.playHit();
+            }
+        }
+    }
+
+    // explode others when explosive brick is destroyed
     private void explode(Brick explosiveBrick, List<Brick> bricks) {
-        double explositionRadius = 100.00; // ban kinh vu no
+        double explositionRadius = 50.00; // ban kinh vu no
         double explosiveCenterX = explosiveBrick.getX() + explosiveBrick.getWidth() / 2;
         double explosiveCenterY = explosiveBrick.getY() + explosiveBrick.getHeight() / 2;
 
@@ -151,21 +199,6 @@ public class CollisionHandler {
                     gameManager.increaseScore(other.getScore());
                 }
                 other.setDestroyed(true);
-            }
-        }
-    }
-
-    // Paddle <-> PowerUp
-    private void checkPowerUpCollision(Paddle paddle,Ball ball, List<PowerUp> powerUps) {
-        for (PowerUp powerUp : powerUps) {
-            if (powerUp.isCollected()) {
-                continue;
-            }
-
-            // only top collision
-            if(paddle.getBounds().intersects(powerUp.getBounds())) {
-                powerUp.applyEffect(paddle, ball);
-                powerUp.collect();
             }
         }
     }

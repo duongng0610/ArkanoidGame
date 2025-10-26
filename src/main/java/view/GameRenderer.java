@@ -8,22 +8,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import util.Constants;
+import util.FontLoader;
+import util.ImgLoader;
 
 public class GameRenderer {
     private GraphicsContext gc;
-    private Font gameFont = Font.loadFont(getClass().getResourceAsStream("/assets/game/custom_font.ttf"), 20);
-    private Font messageFont = Font.font("Verdana", 40);
 
-    // Giả sử bạn có hình ảnh cho mạng sống đầy (full) và mạng sống đã mất (empty)
-    // Đặt đường dẫn đến file hình ảnh (có thể là resource trong project, ví dụ: "/images/full_heart.png")
-    private Image fullHeart = new Image(getClass().getResourceAsStream("/assets/game/full_heart.png"));
-    private Image emptyHeart = new Image(getClass().getResourceAsStream("/assets/game/empty_heart.png"));
+    private static final Font gameFont = FontLoader.loadFont("/assets/game/game_font.ttf", 20);
+    private static final Font messageFont = FontLoader.loadFont("/assets/game/message_font.ttf", 40);
 
-    // Giả sử số mạng sống tối đa là 3 (bạn có thể thay đổi con số này)
-    private static final int MAX_LIVES = 3;
-
-    // Kích thước hình ảnh (điều chỉnh theo nhu cầu)
-    private static final double HEART_SIZE = 30;
+    private static final Image fullHeart = ImgLoader.loadImage("/assets/game/full_heart.png");
+    private static final Image emptyHeart = ImgLoader.loadImage("/assets/game/empty_heart.png");
 
     public GameRenderer(Canvas canvas) {
         this.gc = canvas.getGraphicsContext2D();
@@ -38,21 +33,25 @@ public class GameRenderer {
     }
 
     public void updateLives(int lives) {
-        // Xóa khu vực cũ
-        gc.clearRect(Constants.SCREEN_WIDTH - (MAX_LIVES * (HEART_SIZE + 5)) - 50, 0, (MAX_LIVES * (HEART_SIZE + 5)) + 50, 50);
+        double totalWidth = Constants.INITIAL_LIVES * Constants.HEART_SIZE + (Constants.INITIAL_LIVES - 1) * Constants.HEART_GAP;
+        double startX = Constants.SCREEN_WIDTH - totalWidth - Constants.HEART_PADDING;
 
-        // Vẽ chữ "Lives:" nếu muốn giữ lại, hoặc bỏ nếu chỉ muốn hình ảnh
+        // Clear
+        gc.clearRect(startX - 20, 0, totalWidth + Constants.HEART_PADDING * 2, 50);
+
+        // Draw Text: Lives
         gc.setFill(Color.RED);
         gc.setFont(gameFont);
         gc.setTextAlign(TextAlignment.RIGHT);
 
-        // Vẽ hình ảnh cho mạng sống
-        double x = Constants.SCREEN_WIDTH - (MAX_LIVES * (HEART_SIZE + 5)); // Bắt đầu từ phải, cách lề một chút
-        for (int i = 0; i < MAX_LIVES; i++) {
+        // Draw Img : heart
+        for (int i = 0; i < Constants.INITIAL_LIVES; i++) {
             if (i < lives) {
-                gc.drawImage(fullHeart, x + i * (HEART_SIZE + 5), 10, HEART_SIZE, HEART_SIZE);
+                gc.drawImage(fullHeart, startX + i * (Constants.HEART_SIZE + Constants.HEART_GAP),
+                        10, Constants.HEART_SIZE, Constants.HEART_SIZE);
             } else {
-                gc.drawImage(emptyHeart, x + i * (HEART_SIZE + 5), 10, HEART_SIZE, HEART_SIZE);
+                gc.drawImage(emptyHeart, startX + i * (Constants.HEART_SIZE + Constants.HEART_GAP),
+                        10, Constants.HEART_SIZE, Constants.HEART_SIZE);
             }
         }
     }

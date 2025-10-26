@@ -16,8 +16,6 @@ public abstract class GameObject {
         this.height = height;
     }
 
-    // Getter & Setter
-
     public double getX() {
         return x;
     }
@@ -40,11 +38,6 @@ public abstract class GameObject {
 
     public double getHeight() {
         return height;
-    }
-
-    public void setPosition(double x, double y) {
-        this.x = x;
-        this.y = y;
     }
 
     public Node getView() {

@@ -19,7 +19,7 @@ dependencies {
 
 javafx {
     version = "17"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media' ]
 }
 
 application {
@@ -34,7 +34,7 @@ java {
 
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // giữ encoding nguồn để compiler đọc file .java đúng, không ảnh hưởng output console
+    options.encoding = 'UTF-8'
 }
 
 test {

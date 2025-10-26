@@ -1,51 +1,76 @@
 package controller;
 
 import game.GameManager;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import objects.Paddle;
-
+import javafx.scene.input.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
 
 public class InputHandler {
-    private Set<KeyCode> activeKeys = new HashSet<>();
-    private Paddle paddle;
-    private GameManager gameManager;
+    private final Set<KeyCode> activeKeys = new HashSet<>();
+    private final Paddle paddle;
+    private final GameManager gameManager;
     private boolean pWasPressed = false;
 
     public InputHandler(Scene scene, Paddle paddle, GameManager gameManager) {
         this.paddle = paddle;
         this.gameManager = gameManager;
-        // When push a key, add to Set
-        scene.setOnKeyPressed(event -> activeKeys.add(event.getCode()));
-        // When pull a key, remove from Set
-        scene.setOnKeyReleased(event -> activeKeys.remove(event.getCode()));
+
+        setupInputListeners(scene);
+        scene.getRoot().requestFocus();
     }
 
-    public void handleInput() {
-        // paddle
-        if (activeKeys.contains(KeyCode.LEFT)) {
-            paddle.moveLeft();
-        } else if (activeKeys.contains(KeyCode.RIGHT)) {
-            paddle.moveRight();
-        }
+    // get key from player and handle
+    private void setupInputListeners(Scene scene) {
+        scene.setOnKeyPressed(this::onKeyPressed);
+        scene.setOnKeyReleased(this::onKeyReleased);
+    }
 
-        // pause game
-        if (activeKeys.contains(KeyCode.P)) {
-            if (!pWasPressed) {
-                gameManager.togglePause();
-                pWasPressed = true;
-            }
-        } else {
+    // hande event-based
+    private void onKeyPressed(KeyEvent event) {
+        KeyCode code = event.getCode();
+        activeKeys.add(code);
+
+        switch (code) {
+            case P:
+                handleTogglePause();
+                break;
+            case ESCAPE:
+                gameManager.returnToMenu(250);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void onKeyReleased(KeyEvent event) {
+        KeyCode code = event.getCode();
+        activeKeys.remove(code);
+
+        if (code == KeyCode.P) {
             pWasPressed = false;
         }
+    }
 
-        // exit game
-        if (activeKeys.contains(KeyCode.ESCAPE)) {
-            Platform.exit();
+    private void handleTogglePause() {
+        if (!pWasPressed) {
+            gameManager.togglePause();
+            pWasPressed = true;
+        }
+    }
+
+    // hande state-based
+    public void update() {
+        boolean leftPressed = activeKeys.contains(KeyCode.LEFT);
+        boolean rightPressed = activeKeys.contains(KeyCode.RIGHT);
+
+        if (activeKeys.contains(KeyCode.LEFT) && !rightPressed) {
+            paddle.moveLeft();
+        } else if (activeKeys.contains(KeyCode.RIGHT) && !leftPressed) {
+            paddle.moveRight();
         }
     }
 }
